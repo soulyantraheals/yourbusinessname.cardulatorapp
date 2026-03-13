@@ -6,7 +6,28 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e11d48"> 
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4732041443987376" crossorigin="anonymous"></script>
+<!-- AdMob / AdSense smart loader -->
+<script>
+  // Detect if running as installed TWA/APK (not browser)
+  const IS_TWA = window.matchMedia('(display-mode: standalone)').matches 
+                 || document.referrer.startsWith('android-app://');
+  
+  // AdMob config — replace with your real AdMob IDs from admob.google.com
+  const ADMOB = {
+    APP_ID:        'ca-app-pub-4732041443987376~7686938076',  // ← your AdMob App ID
+    BANNER_ID:     'ca-app-pub-4732041443987376/7686938076', // ← Banner Ad Unit ID
+    INTERSTITIAL_ID: 'ca-app-pub-4732041443987376/7686938076' // ← Interstitial Ad Unit ID
+  };
+
+  if (!IS_TWA) {
+    // WEB: load AdSense normally
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4732041443987376';
+    s.crossOrigin = 'anonymous';
+    document.head.appendChild(s);
+  }
+</script>
 
     <script>
       if ('serviceWorker' in navigator) {
@@ -20,7 +41,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Star India Agencies | Mahindra Dealer Pro</title>
+    <title>Scrollzea | Cardulator App</title>
 
     <style>
         :root { --main-bg: #050505; --key-bg: #1a1a2e; --accent: #00ffff; --angle: 0deg; }
@@ -72,6 +93,66 @@
         
         /* New Menu Animation */
         .group:hover .group-hover\:block { display: block; }
+
+        /* PWA Install Banner */
+        #pwa-banner {
+            display: none; position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(135deg, #0f0f1a, #1a0a2e);
+            border-top: 2px solid #00ffff;
+            padding: 14px 16px; z-index: 9999;
+            box-shadow: 0 -4px 30px rgba(0,255,255,0.2);
+            animation: slideUp 0.4s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        #pwa-banner.show { display: block; }
+        .pwa-banner-inner { display: flex; align-items: center; gap: 12px; max-width: 420px; margin: 0 auto; }
+        .pwa-banner-icon { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+        .pwa-banner-text { flex: 1; }
+        .pwa-banner-text strong { display: block; font-size: 12px; color: #fff; font-weight: 700; letter-spacing: 0.05em; }
+        .pwa-banner-text span { font-size: 10px; color: #94a3b8; }
+        .pwa-install-btn { background: linear-gradient(90deg, #00ffff, #0066ff); color: #000; font-weight: 800; font-size: 11px; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+        .pwa-dismiss-btn { background: none; border: none; color: #475569; font-size: 18px; cursor: pointer; padding: 4px; flex-shrink: 0; }
+        #ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: flex-end; justify-content: center; backdrop-filter: blur(8px); }
+        #ios-modal.show { display: flex; }
+        .ios-sheet { background: #0f0f1a; border: 1px solid #334155; border-radius: 20px 20px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 480px; animation: slideUp 0.3s ease-out; }
+        .ios-step { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .ios-step-num { width: 28px; height: 28px; border-radius: 50%; background: #00ffff22; border: 1px solid #00ffff; color: #00ffff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .ios-step-text { font-size: 12px; color: #cbd5e1; line-height: 1.4; }
+        .ios-step-text b { color: #fff; }
+        #desktop-toast { display: none; position: fixed; top: 20px; right: 20px; background: #0f0f1a; border: 1px solid #00ffff44; border-radius: 14px; padding: 16px 20px; z-index: 10000; min-width: 280px; box-shadow: 0 8px 32px rgba(0,255,255,0.15); }
+        #desktop-toast.show { display: block; }
+        .toast-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .toast-sub { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+        .toast-btn { background: linear-gradient(90deg, #00ffff, #0066ff); color: #000; font-weight: 800; font-size: 11px; padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; width: 100%; }
+        .toast-close { position: absolute; top: 10px; right: 14px; background: none; border: none; color: #475569; font-size: 16px; cursor: pointer; }
+
+        /* AdMob interstitial overlay */
+        #admob-interstitial {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.95); z-index: 99999;
+            align-items: center; justify-content: center;
+            flex-direction: column;
+        }
+        #admob-interstitial.show { display: flex; }
+        .admob-ad-box {
+            background: #0f0f1a; border: 1px solid #334155;
+            border-radius: 16px; width: 320px; overflow: hidden;
+            position: relative;
+        }
+        .admob-skip-btn {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0,0,0,0.7); color: #fff;
+            border: 1px solid #475569; border-radius: 6px;
+            padding: 4px 10px; font-size: 11px; cursor: pointer;
+            font-weight: 700;
+        }
+        .admob-countdown {
+            display: inline-block; background: rgba(0,0,0,0.7);
+            color: #94a3b8; border: 1px solid #475569;
+            border-radius: 6px; padding: 4px 10px;
+            font-size: 11px; font-weight: 700;
+        }
     </style>
 </head>
 
@@ -80,7 +161,7 @@
         <div class="calculator-body">
             
             <div class="mb-4">
-                <span class="text-[10px] font-bold text-red-500 block mb-2 tracking-widest uppercase text-center">Star India Agencies Pvt. Ltd.</span>
+                <span class="text-[10px] font-bold text-red-500 block mb-2 tracking-widest uppercase text-center">Add Your Business Name Pvt. Ltd.</span>
                 <div class="flex gap-2">
                     <button onclick="toggleModal('themeModal')" class="flex-1 bg-gray-900 text-[9px] py-2 rounded-lg border border-gray-700 font-bold uppercase">⚙️ Settings</button>
                     <button onclick="toggleModal('contactModal')" class="flex-1 bg-red-950 text-[9px] py-2 rounded-lg border border-red-600 font-bold uppercase">📞 Contact</button>
@@ -105,7 +186,7 @@
                             <span class="text-[7px] text-green-400 font-bold uppercase">Live</span>
                         </div>
                         <div id="offerText" class="whitespace-nowrap animate-marquee text-[10px] font-bold text-red-400 tracking-widest uppercase">
-                            🚀 LOADING LATEST MAHINDRA OFFERS...
+                            🚀 LOADING LATEST OFFERS OF YOUR BUSINESS...
                         </div>
                     </div>
                 </div>
@@ -124,29 +205,31 @@
                     </a>
                     <a href="YOUR_IOS_LINK_HERE" class="flex items-center justify-between p-3 hover:bg-blue-900/20 border-b border-gray-800 transition-colors">
                         <span class="text-xs font-bold text-blue-400">🍎 APPLE iOS</span>
-                        <span class="text-[8px] bg-blue-900/50 px-2 py-0.5 rounded text-blue-300">APP STORE</span>
+                        <span class="text-[8px] bg-blue-900/50 px-2 py-0.5 rounded text-blue-300"> coming soon</span>
                     </a>
                     <button onclick="presentInstallPrompt()" class="w-full flex items-center justify-between p-3 hover:bg-yellow-900/20 transition-colors text-left">
-                        <span class="text-xs font-bold text-yellow-400">🌐 PWA WEB APP</span>
+                        <span class="text-xs font-bold text-yellow-400">🌐 DESKTOP/MOBILE APP</span>
                         <span class="text-[8px] bg-yellow-900/50 px-2 py-0.5 rounded text-yellow-300 text-center">INSTALL</span>
                     </button>
+
+                    <a href="YOUR_IOS_LINK_HERE" class="flex items-center justify-between p-3 hover:bg-blue-900/20 border-b border-gray-800 transition-colors">
+                        <span class="text-xs font-bold text-blue-400">🛒 ORDER THIS APP</span>
+                        <span class="text-[8px] bg-blue-900/50 px-2 py-0.5 rounded text-blue-300"> BUY NOW</span>
+                    </a>
+
+
                 </div>
             </div>
 
             <div class="mt-4 bg-black border border-gray-800 p-1 rounded overflow-hidden">
                 <div class="whitespace-nowrap animate-marquee text-[10px] text-gray-500 uppercase">
-                    Visit Star India Agencies for Best Deals | Happy Holi | Professional Calculator Hub
+                    Visit "Your Business Name for Best Deals" | Merry Christmas | Professional Calculator Hub
                 </div>
             </div>
 
-            <div class="mt-4 flex justify-center border-t border-b border-gray-800 py-2">
-                <ins class="adsbygoogle"
-                     style="display:inline-block;width:320px;height:50px"
-                     data-ad-client="ca-app-pub-4732041443987376"
-                     data-ad-slot="7686938076"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
+            <!-- Smart Ad Banner: AdMob in APK, AdSense on Web -->
+            <div id="ad-container" class="mt-4 flex justify-center border-t border-b border-gray-800 py-2" style="min-height:50px;">
+                <!-- filled dynamically by initAds() -->
             </div>
 
         </div>
@@ -167,25 +250,27 @@
                     <option value="blue">Blue Switch (Clicky)</option>
                     <option value="brown">Brown Switch (Tactile)</option>
                     <option value="red">Red Switch (Linear)</option>
+                    <option value="retro">Retro Typewriter</option>
                 </select>
             </div>
             <button onclick="toggleModal('themeModal')" class="w-full bg-cyan-600 text-white font-bold py-3 rounded-xl mt-6">SAVE & CLOSE</button>
+
         </div>
     </div>
 
     <div id="contactModal" class="modal">
         <div class="bg-[#0f0f1a] border-2 border-red-600 rounded-[2rem] p-8 w-80 text-center">
-            <h2 class="text-lg font-bold text-red-500 mb-4 font-['Orbitron']">CONTACT DEALERSHIP</h2>
+            <h2 class="text-lg font-bold text-red-500 mb-4 font-['Orbitron']">CONTACT BUSINESS NAME</h2>
             <div class="space-y-2 mb-4">
-                <a href="tel:7067321621" class="contact-btn">🚗 BOOK NEW CAR</a>
-                <a href="tel:7067321621" class="contact-btn">🔑 BOOK TEST DRIVE</a>
-                <a href="tel:9800055555" class="contact-btn !bg-indigo-800">🛠️ SERVICE BOOKING</a>
-                <a href="https://wa.me/917067321621" class="contact-btn !bg-green-600">💬 WHATSAPP US</a>
+                <a href="tel:1234567899" class="contact-btn">🚗 BOOK PRODUCT</a>
+                <a href="tel:1234567899" class="contact-btn">🔑 BOOK TEST DRIVE</a>
+                <a href="tel:1234567899" class="contact-btn !bg-indigo-800">🛠️ SERVICE BOOKING</a>
+                <a href="https://wa.me/917029194911" class="contact-btn !bg-green-600">💬 WHATSAPP US</a>
             </div>
             <div class="flex justify-center gap-4 mt-4 border-t border-gray-800 pt-4">
-                <a href="https://www.facebook.com/starkgp1" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" class="w-5 h-5 invert"></a>
-                <a href="https://www.instagram.com/mahindra_starindia" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" class="w-5 h-5 invert"></a>
-                <a href="https://www.starkgp.com" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png" class="w-5 h-5 invert"></a>
+                <a href="https://www.facebook.com/scrollzea" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" class="w-5 h-5 invert"></a>
+                <a href="https://www.instagram.com/scrollzea" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" class="w-5 h-5 invert"></a>
+                <a href="https://scrollzea.vercel.app/" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png" class="w-5 h-5 invert"></a>
             </div>
             <button onclick="toggleModal('contactModal')" class="mt-4 text-gray-500 text-[10px] uppercase">Close</button>
         </div>
@@ -193,7 +278,7 @@
 
     <script>
         const carImages = [
-            { src: 'icons/range_of_cars.png', offer: '🚀 XUV700: 0% DOWNPAYMENT DEAL', msg: 'Hi! I want details on the XUV700 offer.' },
+            { src: 'icons/range_of_cars.png', offer: '🚀 Add your BUSINESS PRODIUCTS NAME | IMAGES | DEALS', msg: 'Hi! I want details on the XUV700 offer.' },
             { src: 'icons/range_of_cars.png', offer: '🔥 THAR ROXX: BOOKINGS NOW OPEN', msg: 'I want to book the new THAR ROXX.' },
             { src: 'icons/range_of_cars.png', offer: '👑 SCORPIO-N: THE BIG DADDY IS HERE', msg: 'Send me the Scorpio-N price list.' }
         ];
@@ -208,6 +293,7 @@
             renderKeys();
             loadSettings(); 
             setInterval(rotateSlider, 4000);
+            initAds(); // smart ad loader
         };
 
         function saveSettings() {
@@ -331,20 +417,207 @@
 
         function toggleModal(id) { document.getElementById(id).classList.toggle('active'); }
 
-        let deferredPrompt;
+        // ── ADMOB / ADSENSE SMART ADS ────────────────────────────────
+        function initAds() {
+            const container = document.getElementById('ad-container');
+            if (!container) return;
+
+            if (IS_TWA) {
+                // ── RUNNING AS APK/TWA: use AdMob ──
+                container.innerHTML = `
+                    <ins class="adsbygoogle"
+                         style="display:inline-block;width:320px;height:50px"
+                         data-ad-client="ca-app-pub-4732041443987376"
+                         data-ad-slot="${ADMOB.BANNER_ID.split('/')[1] || 'REPLACE_BANNER_SLOT'}"></ins>`;
+                // Load AdMob JS (same SDK, different ad unit)
+                const s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4732041443987376';
+                s.crossOrigin = 'anonymous';
+                s.onload = () => (adsbygoogle = window.adsbygoogle || []).push({});
+                document.head.appendChild(s);
+
+                // Show interstitial on app open after 2s delay
+                setTimeout(showInterstitial, 2000);
+
+            } else {
+                // ── RUNNING ON WEB: use AdSense ──
+                container.innerHTML = `
+                    <ins class="adsbygoogle"
+                         style="display:inline-block;width:320px;height:50px"
+                         data-ad-client="ca-app-pub-4732041443987376"
+                         data-ad-slot="7686938076"></ins>`;
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            }
+        }
+
+        // Interstitial: show on app open, skip after 5s
+        let interstitialShown = false;
+        function showInterstitial() {
+            if (interstitialShown || !IS_TWA) return;
+            interstitialShown = true;
+            const modal = document.getElementById('admob-interstitial');
+            const skipBtn = document.getElementById('admob-skip');
+            const timer = document.getElementById('admob-timer');
+            modal.classList.add('show');
+            // Load ad inside
+            (adsbygoogle = window.adsbygoogle || []).push({});
+            // Countdown 5s then enable skip
+            let count = 5;
+            const interval = setInterval(() => {
+                count--;
+                timer.textContent = count > 0 ? `Skip in ${count}s` : 'Ready';
+                if (count <= 0) {
+                    clearInterval(interval);
+                    skipBtn.disabled = false;
+                    skipBtn.style.background = '#e11d48';
+                    timer.style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        function closeInterstitial() {
+            document.getElementById('admob-interstitial').classList.remove('show');
+        }
+
+        // ── PWA SMART INSTALL ──────────────────────────────────────────
+        let deferredPrompt = null;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isMobile = /Android|iPhone|iPad/.test(navigator.userAgent);
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        const dismissed = sessionStorage.getItem('pwa_dismissed');
+
+        // Capture install prompt (Android / Chrome desktop)
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            if (!isStandalone && !dismissed) {
+                setTimeout(() => {
+                    if (isMobile) {
+                        document.getElementById('pwa-banner').classList.add('show');
+                    } else {
+                        document.getElementById('desktop-toast').classList.add('show');
+                    }
+                }, 3000); // show after 3s
+            }
         });
 
+        // iOS: show manual instructions banner after 3s
+        if (isIOS && !isStandalone && !dismissed) {
+            setTimeout(() => {
+                document.getElementById('pwa-banner').classList.add('show');
+            }, 3000);
+        }
+
+        async function triggerInstall() {
+            if (deferredPrompt) {
+                // Android / Chrome Desktop — native prompt
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                dismissBanner();
+            } else if (isIOS) {
+                // iOS — show step-by-step instructions
+                document.getElementById('pwa-banner').classList.remove('show');
+                document.getElementById('ios-modal').classList.add('show');
+            } else {
+                // Fallback for unsupported browsers
+                alert('To install: open this page in Chrome or Edge, then use the browser menu → "Install App" or "Add to Home Screen".');
+            }
+        }
+
+        function dismissBanner() {
+            document.getElementById('pwa-banner').classList.remove('show');
+            document.getElementById('desktop-toast').classList.remove('show');
+            sessionStorage.setItem('pwa_dismissed', '1');
+        }
+
+        function closeIosModal(e) {
+            if (e.target === document.getElementById('ios-modal')) {
+                document.getElementById('ios-modal').classList.remove('show');
+            }
+        }
+
+        // "GET THE APP" button — same smart logic
         async function presentInstallPrompt() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt = null;
+            } else if (isIOS) {
+                document.getElementById('ios-modal').classList.add('show');
             } else {
-                alert("Installation prompt is only available in supported browsers when the app isn't already installed.");
+                alert('Open in Chrome or Edge and use the browser menu → "Install App" or "Add to Home Screen".');
             }
         }
     </script>
+    <!-- AdMob Interstitial Overlay (shown in TWA/APK only) -->
+    <div id="admob-interstitial">
+        <div class="admob-ad-box">
+            <div style="padding:16px;text-align:center;">
+                <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Advertisement</div>
+                <!-- AdMob Banner inside interstitial -->
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:300px;height:250px"
+                     data-ad-client="ca-app-pub-4732041443987376"
+                     data-ad-slot="REPLACE_WITH_INTERSTITIAL_SLOT"></ins>
+            </div>
+            <div style="padding:10px 16px;background:#0a0a14;display:flex;align-items:center;justify-content:between;gap:8px;">
+                <span id="admob-timer" class="admob-countdown">Skip in 5s</span>
+                <div style="flex:1"></div>
+                <button id="admob-skip" class="admob-skip-btn" onclick="closeInterstitial()" disabled>✕ Skip</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Install Banner (Android/Desktop Chrome) -->
+    <div id="pwa-banner">
+        <div class="pwa-banner-inner">
+            <img src="icons/cardulatorlogoinstally.png" class="pwa-banner-icon" alt="App Icon">
+            <div class="pwa-banner-text">
+                <strong>📲 INSTALL MAHINDRA PRO</strong>
+                <span>Add to Home Screen — works offline</span>
+            </div>
+            <button class="pwa-install-btn" onclick="triggerInstall()">INSTALL</button>
+            <button class="pwa-dismiss-btn" onclick="dismissBanner()" aria-label="Dismiss">✕</button>
+        </div>
+    </div>
+
+    <!-- iOS Install Instructions Modal -->
+    <div id="ios-modal" onclick="closeIosModal(event)">
+        <div class="ios-sheet">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+                <img src="icons/cardulatorlogoinstally.png" style="width:40px;height:40px;border-radius:10px;">
+                <div>
+                    <div style="font-size:14px;font-weight:800;color:#fff;">Install Mahindra Pro</div>
+                    <div style="font-size:10px;color:#94a3b8;">Add to your iPhone Home Screen</div>
+                </div>
+                <button onclick="document.getElementById('ios-modal').classList.remove('show')" style="margin-left:auto;background:none;border:none;color:#475569;font-size:22px;cursor:pointer;">✕</button>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">1</div>
+                <div class="ios-step-text">Tap the <b>Share</b> button <span style="display:inline-block;background:#0a84ff;border-radius:5px;padding:1px 6px;font-size:13px;">⬆</span> at the bottom of Safari</div>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">2</div>
+                <div class="ios-step-text">Scroll down and tap <b>"Add to Home Screen"</b></div>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">3</div>
+                <div class="ios-step-text">Tap <b>"Add"</b> in the top right — done! 🎉</div>
+            </div>
+            <div style="margin-top:8px;padding:10px;background:#00ffff11;border:1px solid #00ffff33;border-radius:10px;font-size:10px;color:#94a3b8;text-align:center;">
+                The app will appear on your Home Screen like a native app
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Install Toast -->
+    <div id="desktop-toast" style="position:relative;">
+        <button class="toast-close" onclick="document.getElementById('desktop-toast').classList.remove('show')">✕</button>
+        <div class="toast-title">💻 Install Mahindra Pro</div>
+        <div class="toast-sub">Get the full app experience on your DESKTOP/MOBILE</div>
+        <button class="toast-btn" onclick="triggerInstall()">INSTALL NOW</button>
+    </div>
+
 </body>
 </html>
