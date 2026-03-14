@@ -2,7 +2,7 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "com.mahindra.pro.starindia",
-    "sha256_cert_fingerprints": ["PASTE_YOUR_SHA256_HERE_FROM_PWABUILDER"]
+    "package_name": "com.scrollzea.cardulator",
+    "sha256_cert_fingerprints": ["PASTE_SHA256_AFTER_DOWNLOAD"]
   }
 }]
