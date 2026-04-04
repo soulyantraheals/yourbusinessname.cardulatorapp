@@ -6,21 +6,17 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e11d48"> 
 
-<!-- AdMob / AdSense smart loader -->
 <script>
-  // Detect if running as installed TWA/APK (not browser)
   const IS_TWA = window.matchMedia('(display-mode: standalone)').matches 
                  || document.referrer.startsWith('android-app://');
   
-  // AdMob config — replace with your real AdMob IDs from admob.google.com
   const ADMOB = {
-    APP_ID:        'ca-app-pub-4732041443987376~7686938076',  // ← your AdMob App ID
-    BANNER_ID:     'ca-app-pub-4732041443987376/7686938076', // ← Banner Ad Unit ID
-    INTERSTITIAL_ID: 'ca-app-pub-4732041443987376/7686938076' // ← Interstitial Ad Unit ID
+    APP_ID:        'ca-app-pub-4732041443987376~7686938076',
+    BANNER_ID:     'ca-app-pub-4732041443987376/7686938076',
+    INTERSTITIAL_ID: 'ca-app-pub-4732041443987376/7686938076'
   };
 
   if (!IS_TWA) {
-    // WEB: load AdSense normally
     const s = document.createElement('script');
     s.async = true;
     s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4732041443987376';
@@ -91,7 +87,6 @@
         .modal.active { display: flex; }
         .contact-btn { background: linear-gradient(90deg, #e11d48, #9f1239); color: white; font-weight: bold; border-radius: 0.8rem; padding: 12px; font-size: 0.8rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; text-decoration: none; }
         
-        /* New Menu Animation */
         .group:hover .group-hover\:block { display: block; }
 
         /* PWA Install Banner */
@@ -153,6 +148,12 @@
             border-radius: 6px; padding: 4px 10px;
             font-size: 11px; font-weight: 700;
         }
+
+        /* Get The App dropdown open state */
+        #getapp-dropdown { display: none; }
+        #getapp-dropdown.open { display: block; }
+        #getapp-chevron { transition: transform 0.2s; }
+        #getapp-chevron.open { transform: rotate(180deg); }
     </style>
 </head>
 
@@ -192,13 +193,14 @@
                 </div>
             </a>
 
-            <div class="relative inline-block w-full mt-4 px-2 group">
-                <button class="w-full bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 text-white py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all group-hover:border-cyan-500">
+            <!-- GET THE APP — back-button aware, no hover dependency -->
+            <div class="relative w-full mt-4 px-2">
+                <button id="getapp-btn" onclick="toggleGetApp()" class="w-full bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 text-white py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all">
                     📥 GET THE APP
-                    <svg class="w-3 h-3 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    <svg id="getapp-chevron" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
                 
-                <div class="absolute bottom-full left-2 right-2 mb-1 bg-[#0f0f1a] border border-gray-700 rounded-xl overflow-hidden shadow-2xl z-[100] hidden group-hover:block">
+                <div id="getapp-dropdown" class="absolute bottom-full left-2 right-2 mb-1 bg-[#0f0f1a] border border-gray-700 rounded-xl overflow-hidden shadow-2xl z-[100]">
                     <a href="https://play.google.com/store/apps/details?id=com.scrollzea.cardulator" class="flex items-center justify-between p-3 hover:bg-green-900/20 border-b border-gray-800 transition-colors">
                         <span class="text-xs font-bold text-green-400">🤖 ANDROID APK</span>
                         <span class="text-[8px] bg-green-900/50 px-2 py-0.5 rounded text-green-300">DOWNLOAD</span>
@@ -211,8 +213,7 @@
                         <span class="text-xs font-bold text-yellow-400">🌐 DESKTOP/MOBILE APP</span>
                         <span class="text-[8px] bg-yellow-900/50 px-2 py-0.5 rounded text-yellow-300 text-center">INSTALL</span>
                     </button>
-
-                    <a href="https://rzp.io/rzp/j3rk34j" class="flex items-center justify-between p-3 hover:bg-blue-900/20 border-b border-gray-800 transition-colors">
+                    <a href="YOUR_IOS_LINK_HERE" class="flex items-center justify-between p-3 hover:bg-blue-900/20 border-b border-gray-800 transition-colors">
                         <span class="text-xs font-bold text-blue-400">🛒 ORDER THIS APP</span>
                         <span class="text-[8px] bg-blue-900/50 px-2 py-0.5 rounded text-blue-300"> BUY NOW</span>
                     </a>
@@ -225,9 +226,7 @@
                 </div>
             </div>
 
-            <!-- Smart Ad Banner: AdMob in APK, AdSense on Web -->
             <div id="ad-container" class="mt-4 flex justify-center border-t border-b border-gray-800 py-2" style="min-height:50px;">
-                <!-- filled dynamically by initAds() -->
             </div>
 
         </div>
@@ -251,8 +250,8 @@
                     <option value="retro">Retro Typewriter</option>
                 </select>
             </div>
-            <button onclick="toggleModal('themeModal')" class="w-full bg-cyan-600 text-white font-bold py-3 rounded-xl mt-6">SAVE & CLOSE</button>
-
+            <!-- Save & Close works with back button via closeActiveModal() -->
+            <button onclick="closeActiveModal()" class="w-full bg-cyan-600 text-white font-bold py-3 rounded-xl mt-6">SAVE & CLOSE</button>
         </div>
     </div>
 
@@ -270,7 +269,8 @@
                 <a href="https://www.instagram.com/scrollzea" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" class="w-5 h-5 invert"></a>
                 <a href="https://scrollzea.vercel.app/" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png" class="w-5 h-5 invert"></a>
             </div>
-            <button onclick="toggleModal('contactModal')" class="mt-4 text-gray-500 text-[10px] uppercase">Close</button>
+            <!-- Close button works with back button via closeActiveModal() -->
+            <button onclick="closeActiveModal()" class="mt-4 text-gray-500 text-[10px] uppercase">Close</button>
         </div>
     </div>
 
@@ -287,12 +287,88 @@
         let currentIndex = 0;
         const keys = ['C', '÷', '×', '⌫', '7', '8', '9', '-', '4', '5', '6', '+', '1', '2', '3', '=', '0', '.', 'LOG'];
 
+        // ── CALCULATION COUNTER for interstitial trigger ──────────────
+        let calcCount = 0;
+        const INTERSTITIAL_TRIGGER = 5; // show after 5 calculations
+        let interstitialShown = false;
+
+        // ── GET THE APP dropdown toggle ───────────────────────────────
+        let getAppOpen = false;
+        function toggleGetApp() {
+            getAppOpen = !getAppOpen;
+            document.getElementById('getapp-dropdown').classList.toggle('open', getAppOpen);
+            document.getElementById('getapp-chevron').classList.toggle('open', getAppOpen);
+            if (getAppOpen) {
+                // push a history state so back button can close it
+                history.pushState({ panel: 'getapp' }, '');
+            }
+        }
+        function closeGetApp() {
+            if (!getAppOpen) return;
+            getAppOpen = false;
+            document.getElementById('getapp-dropdown').classList.remove('open');
+            document.getElementById('getapp-chevron').classList.remove('open');
+        }
+
+        // ── MODAL helpers ─────────────────────────────────────────────
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            const wasActive = modal.classList.contains('active');
+            // close all first
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            if (!wasActive) {
+                modal.classList.add('active');
+                // push a history state so back button can close the modal
+                history.pushState({ panel: id }, '');
+            }
+        }
+
+        // Called by "Save & Close" and "Close" buttons
+        function closeActiveModal() {
+            const open = document.querySelector('.modal.active');
+            if (open) {
+                open.classList.remove('active');
+                // mirror what the back button does — pop the state we pushed
+                if (history.state && history.state.panel) {
+                    history.back();
+                }
+            }
+        }
+
+        // ── BACK BUTTON (popstate) handler ────────────────────────────
+        window.addEventListener('popstate', function(e) {
+            // 1. Close any open modal
+            const openModal = document.querySelector('.modal.active');
+            if (openModal) {
+                openModal.classList.remove('active');
+                return;
+            }
+            // 2. Close Get The App dropdown
+            if (getAppOpen) {
+                closeGetApp();
+                return;
+            }
+            // 3. Close iOS install modal
+            const iosModal = document.getElementById('ios-modal');
+            if (iosModal && iosModal.classList.contains('show')) {
+                iosModal.classList.remove('show');
+                return;
+            }
+            // 4. Close AdMob interstitial
+            const adModal = document.getElementById('admob-interstitial');
+            if (adModal && adModal.classList.contains('show')) {
+                closeInterstitial();
+                return;
+            }
+            // 5. Nothing open — let the app exit naturally (don't push again)
+        });
+
         window.onload = () => {
             renderKeys();
             loadSettings(); 
             setInterval(rotateSlider, 4000);
-            initAds(); // smart ad loader
-            // ← NO interstitial on app open (removed setTimeout showInterstitial)
+            initAds();
+            // NO interstitial on app open — it fires after 5 calculations instead
         };
 
         function saveSettings() {
@@ -345,15 +421,16 @@
             } else if (k === '=') {
                 try {
                     let result = eval(expr.replace(/×/g, '*').replace(/÷/g, '/')).toString();
-                    let history = JSON.parse(localStorage.getItem('calc_history_list') || "[]");
+                    let hist = JSON.parse(localStorage.getItem('calc_history_list') || "[]");
                     const entry = `${expr} = ${result}`;
-                    history.unshift(entry); 
-                    if (history.length > 10) history = history.slice(0, 10);
-                    localStorage.setItem('calc_history_list', JSON.stringify(history));
+                    hist.unshift(entry); 
+                    if (hist.length > 10) hist = hist.slice(0, 10);
+                    localStorage.setItem('calc_history_list', JSON.stringify(hist));
                     expr = result;
 
-                    // ── Show interstitial after every 5 entries in log history ──
-                    if (IS_TWA && history.length > 0 && history.length % 5 === 0) {
+                    // ── Count completed calculations → trigger interstitial after 5 ──
+                    calcCount++;
+                    if (IS_TWA && calcCount >= INTERSTITIAL_TRIGGER && !interstitialShown) {
                         showInterstitial();
                     }
 
@@ -376,7 +453,7 @@
                 const data = carImages[currentIndex];
                 img.src = data.src;
                 txt.innerText = data.offer + " — CLICK TO INQUIRE —";
-                link.href = `https://wa.me/917029194911?text=${encodeURIComponent(data.msg)}`;
+                link.href = `https://wa.me/917067321621?text=${encodeURIComponent(data.msg)}`;
                 img.style.transform = "translateX(20px)";
                 setTimeout(() => {
                     img.style.opacity = "1";
@@ -420,15 +497,12 @@
             saveSettings();
         }
 
-        function toggleModal(id) { document.getElementById(id).classList.toggle('active'); }
-
         // ── ADMOB / ADSENSE SMART ADS ────────────────────────────────
         function initAds() {
             const container = document.getElementById('ad-container');
             if (!container) return;
 
             if (IS_TWA) {
-                // ── RUNNING AS APK/TWA: use AdMob ──
                 container.innerHTML = `
                     <ins class="adsbygoogle"
                          style="display:inline-block;width:320px;height:50px"
@@ -440,12 +514,9 @@
                 s.crossOrigin = 'anonymous';
                 s.onload = () => (adsbygoogle = window.adsbygoogle || []).push({});
                 document.head.appendChild(s);
-
-                // ← REMOVED: setTimeout(showInterstitial, 2000)
-                // Interstitial now fires only after every 5 calculations via log history
+                // ❌ Removed: setTimeout(showInterstitial, 2000) — no longer fires on open
 
             } else {
-                // ── RUNNING ON WEB: use AdSense ──
                 container.innerHTML = `
                     <ins class="adsbygoogle"
                          style="display:inline-block;width:320px;height:50px"
@@ -455,23 +526,17 @@
             }
         }
 
-        // Interstitial: triggered by log history count, skip after 5s
-        let interstitialShown = false;
+        // Interstitial — triggered by 5 calculations, not on open
         function showInterstitial() {
-            if (!IS_TWA) return;
+            if (interstitialShown || !IS_TWA) return;
             interstitialShown = true;
             const modal = document.getElementById('admob-interstitial');
             const skipBtn = document.getElementById('admob-skip');
             const timer = document.getElementById('admob-timer');
             modal.classList.add('show');
-            // Reset skip button state for repeat shows
-            skipBtn.disabled = true;
-            skipBtn.style.background = '';
-            timer.style.display = '';
-            timer.textContent = 'Skip in 5s';
-            // Load ad inside
+            // Push history state so back button can close the interstitial
+            history.pushState({ panel: 'admob-interstitial' }, '');
             (adsbygoogle = window.adsbygoogle || []).push({});
-            // Countdown 5s then enable skip
             let count = 5;
             const interval = setInterval(() => {
                 count--;
@@ -496,7 +561,6 @@
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
         const dismissed = sessionStorage.getItem('pwa_dismissed');
 
-        // Capture install prompt (Android / Chrome desktop)
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -507,11 +571,10 @@
                     } else {
                         document.getElementById('desktop-toast').classList.add('show');
                     }
-                }, 3000); // show after 3s
+                }, 3000);
             }
         });
 
-        // iOS: show manual instructions banner after 3s
         if (isIOS && !isStandalone && !dismissed) {
             setTimeout(() => {
                 document.getElementById('pwa-banner').classList.add('show');
@@ -520,17 +583,15 @@
 
         async function triggerInstall() {
             if (deferredPrompt) {
-                // Android / Chrome Desktop — native prompt
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 deferredPrompt = null;
                 dismissBanner();
             } else if (isIOS) {
-                // iOS — show step-by-step instructions
                 document.getElementById('pwa-banner').classList.remove('show');
                 document.getElementById('ios-modal').classList.add('show');
+                history.pushState({ panel: 'ios-modal' }, '');
             } else {
-                // Fallback for unsupported browsers
                 alert('To install: open this page in Chrome or Edge, then use the browser menu → "Install App" or "Add to Home Screen".');
             }
         }
@@ -547,24 +608,24 @@
             }
         }
 
-        // "GET THE APP" button — same smart logic
         async function presentInstallPrompt() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt = null;
             } else if (isIOS) {
                 document.getElementById('ios-modal').classList.add('show');
+                history.pushState({ panel: 'ios-modal' }, '');
             } else {
                 alert('Open in Chrome or Edge and use the browser menu → "Install App" or "Add to Home Screen".');
             }
         }
     </script>
-    <!-- AdMob Interstitial Overlay (shown in TWA/APK only) -->
+
+    <!-- AdMob Interstitial Overlay (shown in TWA/APK only, after 5 calculations) -->
     <div id="admob-interstitial">
         <div class="admob-ad-box">
             <div style="padding:16px;text-align:center;">
                 <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Advertisement</div>
-                <!-- AdMob Banner inside interstitial -->
                 <ins class="adsbygoogle"
                      style="display:inline-block;width:300px;height:250px"
                      data-ad-client="ca-app-pub-4732041443987376"
@@ -583,7 +644,7 @@
         <div class="pwa-banner-inner">
             <img src="icons/cardulatorlogoinstally.png" class="pwa-banner-icon" alt="App Icon">
             <div class="pwa-banner-text">
-                <strong>📲 INSTALL CARDULATOR PRO</strong>
+                <strong>📲 INSTALL MAHINDRA PRO</strong>
                 <span>Add to Home Screen — works offline</span>
             </div>
             <button class="pwa-install-btn" onclick="triggerInstall()">INSTALL</button>
@@ -623,7 +684,7 @@
     <!-- Desktop Install Toast -->
     <div id="desktop-toast" style="position:relative;">
         <button class="toast-close" onclick="document.getElementById('desktop-toast').classList.remove('show')">✕</button>
-        <div class="toast-title">💻 Install Cardulator Pro</div>
+        <div class="toast-title">💻 Install Mahindra Pro</div>
         <div class="toast-sub">Get the full app experience on your DESKTOP/MOBILE</div>
         <button class="toast-btn" onclick="triggerInstall()">INSTALL NOW</button>
     </div>
