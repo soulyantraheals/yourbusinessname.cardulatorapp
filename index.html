@@ -102,13 +102,16 @@
                         <span class="text-xs font-bold text-green-400">🤖 ANDROID APK</span>
                         <span class="text-[8px] bg-green-900/50 px-2 py-0.5 rounded text-green-300">DOWNLOAD</span>
                     </a>
-                    <a href="https://www.apple.com/" class="flex items-center justify-between p-3 hover:bg-blue-900/20 border-b border-gray-800 transition-colors">
-                        <span class="text-xs font-bold text-blue-400">🍎 APPLE iOS</span>
-                        <span class="text-[8px] bg-blue-900/50 px-2 py-0.5 rounded text-blue-300">COMING SOON</span>
-                    </a>
+                    
                     <button onclick="presentInstallPrompt()" class="w-full flex items-center justify-between p-3 hover:bg-yellow-900/20 border-b border-gray-800 transition-colors text-left">
-                        <span class="text-xs font-bold text-yellow-400">🌐 INSTALL APP</span>
-                        <span class="text-[8px] bg-yellow-900/50 px-2 py-0.5 rounded text-yellow-300 text-center">INSTALL</span>
+                        <span class="text-xs font-bold text-yellow-400">🍎 APPLE iOS</span>
+                        <span class="text-[8px] bg-yellow-900/50 px-2 py-0.5 rounded text-yellow-300 text-center">COMING SOON</span>
+                    </button>
+
+
+                    <button onclick="presentInstallPrompt()" class="w-full flex items-center justify-between p-3 hover:bg-yellow-900/20 border-b border-gray-800 transition-colors text-left">
+                        <span class="text-xs font-bold text-yellow-400">🌐 INSTALL PWA APP</span>
+                        <span class="text-[8px] bg-yellow-900/50 px-2 py-0.5 rounded text-yellow-300 text-center">COMING SOON</span>
                     </button>
                     <a href="https://rzp.io/rzp/j3rk34j" class="flex items-center justify-between p-3 hover:bg-indigo-900/20 transition-colors">
                         <span class="text-xs font-bold text-indigo-400">🛒 ORDER THIS APP</span>
@@ -210,13 +213,23 @@
         }
 
         function triggerAction(k) {
+            playSound();
             const resDisplay = document.getElementById('res');
-            if (k === 'LOG') return alert("History feature active");
+            if (k === 'LOG') {
+                const historyList = JSON.parse(localStorage.getItem('calc_history_list') || "[]");
+                alert(historyList.length === 0 ? "No history." : historyList.join('\n'));
+                return;
+            }
             if (k === 'C') expr = "";
             else if (k === '⌫') expr = expr.slice(0, -1);
             else if (k === '=') {
-                try { expr = eval(expr.replace(/×/g, '*').replace(/÷/g, '/')).toString(); } 
-                catch { expr = "Error"; }
+                try {
+                    let result = eval(expr.replace(/×/g, '*').replace(/÷/g, '/')).toString();
+                    let hist = JSON.parse(localStorage.getItem('calc_history_list') || "[]");
+                    hist.unshift(`${expr} = ${result}`);
+                    localStorage.setItem('calc_history_list', JSON.stringify(hist.slice(0, 10)));
+                    expr = result;
+                } catch { expr = "Error"; }
             } else {
                 if(expr === "Error") expr = "";
                 expr += k;
@@ -224,9 +237,57 @@
             resDisplay.innerText = expr || "0";
         }
 
-        function toggleRGB() { document.getElementById('mainFrame').classList.toggle('rgb-active'); }
 
-        window.onload = renderKeys;
+
+        function playSound() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const type = document.getElementById('soundSelect').value;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = (type === 'blue') ? 'square' : (type === 'brown') ? 'triangle' : 'sine';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function toggleRGB() { 
+            const frame = document.getElementById('mainFrame');
+            const btn = document.getElementById('rgbToggleBtn');
+            const isActive = frame.classList.toggle('rgb-active');
+            btn.innerText = isActive ? "RGB FRAME: ON" : "RGB FRAME: OFF";
+        }
+
+        function applyChanges() {
+            const theme = document.getElementById('themeSelect').value;
+            const themes = {
+                black: { main: '#050505', key: '#1a1a2e', acc: '#00ffff' },
+                indigo: { main: '#0a0a20', key: '#312e81', acc: '#818cf8' },
+                white: { main: '#f3f4f6', key: '#ffffff', acc: '#111827' },
+                pink: { main: '#2d0a1a', key: '#4d1635', acc: '#ff007f' }
+            };
+            const s = themes[theme];
+            document.documentElement.style.setProperty('--main-bg', s.main);
+            document.documentElement.style.setProperty('--key-bg', s.key);
+            document.documentElement.style.setProperty('--accent', s.acc);
+        }
+
+    
+
+        window.onload = () => { renderKeys(); setInterval(() => {
+            currentIndex = (currentIndex + 1) % carImages.length;
+            document.getElementById('sliderImage').src = carImages[currentIndex].src;
+            document.getElementById('offerText').innerText = carImages[currentIndex].offer + " — CLICK —";
+        }, 4000); };
+
     </script>
+
+
+
+
+
+
+
 </body>
 </html>
