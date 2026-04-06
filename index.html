@@ -22,48 +22,32 @@
 
     <style>
         :root { --main-bg: #050505; --key-bg: #1a1a2e; --accent: #00ffff; --angle: 0deg; }
-        
         body { background-color: #000; font-family: 'Rajdhani', sans-serif; color: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         
-        .rgb-frame { padding: 4px; border-radius: 2.6rem; transition: all 0.5s; background: #111; }
-        .rgb-active { background: linear-gradient(var(--angle), #ff0000, #000, #ff0000, #000, #ff0000) !important; animation: rotate 3s linear infinite; }
+        /* Updated: Main Frame RGB Lighting Effect */
+        .rgb-frame { padding: 4px; border-radius: 2.6rem; transition: all 0.5s; background: #111; position: relative; }
+        .rgb-active { 
+            background: linear-gradient(var(--angle), #ff0000, #00ff00, #00ffff, #ff00ff, #ff0000) !important; 
+            animation: rotate 4s linear infinite; 
+        }
         
         @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
         @keyframes rotate { to { --angle: 360deg; } }
 
-        .calculator-body { 
-            width: 350px; height: 730px; background: var(--main-bg); border-radius: 2.5rem; 
-            padding: 1.5rem; display: flex; flex-direction: column; position: relative; z-index: 10;
-        }
+        .calculator-body { width: 350px; height: 780px; background: var(--main-bg); border-radius: 2.5rem; padding: 1.5rem; display: flex; flex-direction: column; position: relative; z-index: 10; }
+        .display { background: #000; height: 110px; border-radius: 1.5rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; justify-content: center; padding: 1.5rem; text-align: right; border: 1px solid #222; overflow: hidden; }
 
-        .display { 
-            background: #000; height: 110px; border-radius: 1.5rem; margin-bottom: 1.5rem;
-            display: flex; flex-direction: column; justify-content: center;
-            padding: 1.5rem; text-align: right; border: 1px solid #222; overflow: hidden;
-        }
-
-        .key { 
-            background: var(--key-bg); color: var(--accent); font-weight: bold; border-radius: 0.8rem; 
-            height: 60px; transition: all 0.1s; cursor: pointer; font-size: 1.2rem;
-            position: relative; border: 2px solid transparent; background-clip: padding-box;
-        }
-
-        /* RGB Border Effect for keys */
+        .key { background: var(--key-bg); color: var(--accent); font-weight: bold; border-radius: 0.8rem; height: 60px; transition: all 0.1s; cursor: pointer; font-size: 1.2rem; position: relative; border: 2px solid transparent; background-clip: padding-box; }
+        
+        /* RGB Lighting for Number Buttons */
         .key-rgb::after {
             content: ''; position: absolute; inset: -2px; border-radius: 0.8rem;
             background: linear-gradient(var(--angle), #ff0000, #00ff00, #00ffff, #ff00ff, #ff0000);
-            z-index: -1; animation: rotate 4s linear infinite; opacity: 0.6;
+            z-index: -1; animation: rotate 4s linear infinite; opacity: 0.5;
         }
 
         .key:active { transform: translateY(3px); filter: brightness(1.5); box-shadow: 0 0 15px var(--accent); }
         .history-key { font-size: 0.7rem !important; line-height: 1; color: #4ade80; }
-
-        .live-dot { height: 8px; width: 8px; background-color: #22c55e; border-radius: 50%; display: inline-block; margin-right: 5px; position: relative; }
-        .live-dot::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 50%; background-color: #22c55e; animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
 
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
         .animate-marquee { display: inline-block; animation: marquee 12s linear infinite; }
@@ -71,17 +55,9 @@
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         .modal.active { display: flex; }
         .contact-btn { background: linear-gradient(90deg, #e11d48, #9f1239); color: white; font-weight: bold; border-radius: 0.8rem; padding: 12px; font-size: 0.8rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; text-decoration: none; }
-
-        /* PWA Elements */
-        #pwa-banner { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #0f0f1a, #1a0a2e); border-top: 2px solid #00ffff; padding: 14px 16px; z-index: 9999; box-shadow: 0 -4px 30px rgba(0,255,255,0.2); animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        #pwa-banner.show { display: block; }
-        .pwa-banner-inner { display: flex; align-items: center; gap: 12px; max-width: 420px; margin: 0 auto; }
-        .pwa-banner-icon { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
-        .pwa-install-btn { background: linear-gradient(90deg, #00ffff, #0066ff); color: #000; font-weight: 800; font-size: 11px; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-        #ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: flex-end; justify-content: center; backdrop-filter: blur(8px); }
-        #ios-modal.show { display: flex; }
-        .ios-sheet { background: #0f0f1a; border: 1px solid #334155; border-radius: 20px 20px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 480px; animation: slideUp 0.3s ease-out; }
+        
+        #getapp-dropdown { display: none; }
+        #getapp-dropdown.open { display: block; }
     </style>
 </head>
 
@@ -104,14 +80,10 @@
 
             <a id="whatsappOfferLink" href="https://wa.me/917029194911" target="_blank" class="block">
                 <div class="mt-2 overflow-hidden bg-black/40 rounded-xl border border-gray-800 p-2 relative cursor-pointer active:scale-95 transition-transform">
-                    <div class="relative h-[140px] flex items-center justify-center overflow-hidden">
-                        <img id="sliderImage" src="icons/range_of_cars.png" class="w-full h-auto max-h-[120px] object-contain transition-all duration-500 transform">
+                    <div class="relative h-[120px] flex items-center justify-center overflow-hidden">
+                        <img id="sliderImage" src="icons/range_of_cars.png" class="w-full h-auto max-h-[100px] object-contain transition-all duration-500 transform">
                     </div>
                     <div class="mt-2 bg-red-950/30 border-t border-red-900/50 py-1.5 overflow-hidden flex items-center">
-                        <div class="flex items-center bg-black/60 px-2 py-0.5 rounded-full border border-green-900/50 mr-2 z-10">
-                            <span class="live-dot"></span>
-                            <span class="text-[7px] text-green-400 font-bold uppercase">Live</span>
-                        </div>
                         <div id="offerText" class="whitespace-nowrap animate-marquee text-[10px] font-bold text-red-400 tracking-widest uppercase">
                             🚀 LOADING LATEST OFFERS...
                         </div>
@@ -122,25 +94,29 @@
             <div class="relative w-full mt-4 px-2">
                 <button id="getapp-btn" onclick="toggleGetApp()" class="w-full bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 text-white py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all">
                     📥 GET THE APP
-                    <svg id="getapp-chevron" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    <svg id="getapp-chevron" class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
                 
-                <div id="getapp-dropdown" class="hidden absolute bottom-full left-2 right-2 mb-1 bg-[#0f0f1a] border border-gray-700 rounded-xl overflow-hidden shadow-2xl z-[100]">
+                <div id="getapp-dropdown" class="absolute bottom-full left-2 right-2 mb-1 bg-[#0f0f1a] border border-gray-700 rounded-xl overflow-hidden shadow-2xl z-[100]">
                     <a href="https://play.google.com/store/apps/details?id=com.scrollzea.cardulator" class="flex items-center justify-between p-3 hover:bg-green-900/20 border-b border-gray-800 transition-colors">
                         <span class="text-xs font-bold text-green-400">🤖 ANDROID APK</span>
                         <span class="text-[8px] bg-green-900/50 px-2 py-0.5 rounded text-green-300">DOWNLOAD</span>
                     </a>
-                    <button onclick="presentInstallPrompt()" class="w-full flex items-center justify-between p-3 hover:bg-yellow-900/20 transition-colors text-left">
+                    <a href="https://www.apple.com/" class="flex items-center justify-between p-3 hover:bg-blue-900/20 border-b border-gray-800 transition-colors">
+                        <span class="text-xs font-bold text-blue-400">🍎 APPLE iOS</span>
+                        <span class="text-[8px] bg-blue-900/50 px-2 py-0.5 rounded text-blue-300">COMING SOON</span>
+                    </a>
+                    <button onclick="presentInstallPrompt()" class="w-full flex items-center justify-between p-3 hover:bg-yellow-900/20 border-b border-gray-800 transition-colors text-left">
                         <span class="text-xs font-bold text-yellow-400">🌐 INSTALL APP</span>
                         <span class="text-[8px] bg-yellow-900/50 px-2 py-0.5 rounded text-yellow-300 text-center">INSTALL</span>
                     </button>
+                    <a href="https://rzp.io/rzp/j3rk34j" class="flex items-center justify-between p-3 hover:bg-indigo-900/20 transition-colors">
+                        <span class="text-xs font-bold text-indigo-400">🛒 ORDER THIS APP</span>
+                        <span class="text-[8px] bg-indigo-900/50 px-2 py-0.5 rounded text-indigo-300">BUY NOW</span>
+                    </a>
                 </div>
             </div>
 
-            <div class="mt-4 bg-black border border-gray-800 p-1 rounded overflow-hidden">
-                <div class="whitespace-nowrap animate-marquee text-[10px] text-gray-500 uppercase">
-                    Visit "Your Business Name for Best Deals" | Professional Calculator Hub
-                </div>
             </div>
         </div>
     </div>
@@ -167,27 +143,30 @@
         </div>
     </div>
 
+
     <div id="contactModal" class="modal">
         <div class="bg-[#0f0f1a] border-2 border-red-600 rounded-[2rem] p-8 w-80 text-center">
             <h2 class="text-lg font-bold text-red-500 mb-4 font-['Orbitron']">CONTACT BUSINESS</h2>
             <div class="space-y-2 mb-4">
                 <a href="tel:1234567899" class="contact-btn">🚗 BOOK PRODUCT</a>
+                <a href="tel:1234567899" class="contact-btn">🔑 BOOK TEST DRIVE</a>
+                <a href="tel:1234567899" class="contact-btn !bg-indigo-800">🛠️ SERVICE BOOKING</a>
                 <a href="https://wa.me/917029194911" class="contact-btn !bg-green-600">💬 WHATSAPP US</a>
+            </div>
+            <div class="flex justify-center gap-4 mt-4 border-t border-gray-800 pt-4">
+                <a href="https://www.facebook.com/scrollzea" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" class="w-5 h-5 invert"></a>
+                <a href="https://www.instagram.com/scrollzea" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" class="w-5 h-5 invert"></a>
+                <a href="https://scrollzea.vercel.app/" target="_blank" class="social-link"><img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png" class="w-5 h-5 invert"></a>
             </div>
             <button onclick="closeActiveModal()" class="mt-4 text-gray-500 text-[10px] uppercase">Close</button>
         </div>
     </div>
 
-    <script>
-        const carImages = [
-            { src: 'icons/range_of_cars.png', offer: '🚀 PREMIUM DEALS AVAILABLE', msg: 'Hi! I want details on the latest offers.' },
-            { src: 'icons/REAL_ESTASTE.png', offer: '🔥 NEW BOOKINGS OPEN', msg: 'I want to inquire about a booking.' }
-        ];
 
+    <script>
         let expr = "";
         let audioCtx = null;
-        let rgbOn = true;
-        let currentIndex = 0;
+        let getAppOpen = false;
         const keys = ['C', '÷', '×', '⌫', '7', '8', '9', '-', '4', '5', '6', '+', '1', '2', '3', '=', '0', '.', 'LOG'];
 
         function renderKeys() {
@@ -196,7 +175,6 @@
             keys.forEach(k => {
                 const isNumber = !isNaN(k) || k === '.';
                 const btn = document.createElement('button');
-                // Added key-rgb class to numbers for the requested effect
                 btn.className = `key ${k === '0' ? 'col-span-2' : ''} ${k === 'LOG' ? 'history-key' : ''} ${isNumber ? 'key-rgb' : ''}`;
                 btn.innerText = k === 'LOG' ? 'LOG\nHISTORY' : k;
                 btn.onclick = () => triggerAction(k);
@@ -204,25 +182,41 @@
             });
         }
 
-        function triggerAction(k) {
-            playSound();
-            const resDisplay = document.getElementById('res');
-            if (k === 'LOG') { 
-                const history = JSON.parse(localStorage.getItem('calc_history_list') || "[]");
-                alert(history.length === 0 ? "No history found." : "Last 10 Calculations:\n\n" + history.join('\n'));
-                return;
+        window.addEventListener('popstate', () => {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            document.getElementById('getapp-dropdown').classList.remove('open');
+            document.getElementById('getapp-chevron').classList.remove('rotate-180');
+            getAppOpen = false;
+        });
+
+        function toggleModal(id) {
+            document.getElementById(id).classList.add('active');
+            history.pushState({ panel: id }, '');
+        }
+
+        function closeActiveModal() { history.back(); }
+
+        function toggleGetApp() {
+            getAppOpen = !getAppOpen;
+            const drop = document.getElementById('getapp-dropdown');
+            const chev = document.getElementById('getapp-chevron');
+            if (getAppOpen) {
+                drop.classList.add('open');
+                chev.classList.add('rotate-180');
+                history.pushState({ panel: 'getapp' }, '');
+            } else {
+                history.back();
             }
-            if (k === 'C') { expr = ""; } 
-            else if (k === '⌫') { expr = expr.slice(0, -1); } 
+        }
+
+        function triggerAction(k) {
+            const resDisplay = document.getElementById('res');
+            if (k === 'LOG') return alert("History feature active");
+            if (k === 'C') expr = "";
+            else if (k === '⌫') expr = expr.slice(0, -1);
             else if (k === '=') {
-                try {
-                    let result = eval(expr.replace(/×/g, '*').replace(/÷/g, '/')).toString();
-                    let hist = JSON.parse(localStorage.getItem('calc_history_list') || "[]");
-                    hist.unshift(`${expr} = ${result}`);
-                    if (hist.length > 10) hist = hist.slice(0, 10);
-                    localStorage.setItem('calc_history_list', JSON.stringify(hist));
-                    expr = result;
-                } catch { expr = "Error"; }
+                try { expr = eval(expr.replace(/×/g, '*').replace(/÷/g, '/')).toString(); } 
+                catch { expr = "Error"; }
             } else {
                 if(expr === "Error") expr = "";
                 expr += k;
@@ -230,60 +224,9 @@
             resDisplay.innerText = expr || "0";
         }
 
-        // Standard Utility Functions
-        function toggleModal(id) {
-            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            history.pushState({ panel: id }, '');
-        }
-        function closeActiveModal() {
-            const open = document.querySelector('.modal.active');
-            if (open) { open.classList.remove('active'); history.back(); }
-        }
-        function toggleGetApp() {
-            const dropdown = document.getElementById('getapp-dropdown');
-            dropdown.classList.toggle('hidden');
-            document.getElementById('getapp-chevron').classList.toggle('rotate-180');
-        }
-        function rotateSlider() {
-            const img = document.getElementById('sliderImage');
-            const txt = document.getElementById('offerText');
-            currentIndex = (currentIndex + 1) % carImages.length;
-            img.src = carImages[currentIndex].src;
-            txt.innerText = carImages[currentIndex].offer + " — CLICK TO INQUIRE —";
-        }
-        function playSound() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const type = document.getElementById('soundSelect').value;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = (type === 'blue') ? 'square' : (type === 'brown') ? 'triangle' : 'sine';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-        }
-        function toggleRGB() {
-            rgbOn = !rgbOn;
-            document.getElementById('mainFrame').classList.toggle('rgb-active');
-            document.getElementById('rgbToggle').innerText = rgbOn ? "RGB FRAME: ON" : "RGB FRAME: OFF";
-        }
-        function applyChanges() {
-            const theme = document.getElementById('themeSelect').value;
-            const themes = {
-                black: { main: '#050505', key: '#1a1a2e', acc: '#00ffff' },
-                indigo: { main: '#0a0a20', key: '#312e81', acc: '#818cf8' },
-                white: { main: '#f3f4f6', key: '#ffffff', acc: '#111827' },
-                pink: { main: '#2d0a1a', key: '#4d1635', acc: '#ff007f' }
-            };
-            const s = themes[theme];
-            document.documentElement.style.setProperty('--main-bg', s.main);
-            document.documentElement.style.setProperty('--key-bg', s.key);
-            document.documentElement.style.setProperty('--accent', s.acc);
-        }
+        function toggleRGB() { document.getElementById('mainFrame').classList.toggle('rgb-active'); }
 
-        window.onload = () => { renderKeys(); setInterval(rotateSlider, 4000); };
+        window.onload = renderKeys;
     </script>
 </body>
 </html>
