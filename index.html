@@ -254,11 +254,23 @@
         }
 
         function toggleRGB() { 
-            const frame = document.getElementById('mainFrame');
-            const btn = document.getElementById('rgbToggleBtn');
-            const isActive = frame.classList.toggle('rgb-active');
-            btn.innerText = isActive ? "RGB FRAME: ON" : "RGB FRAME: OFF";
-        }
+    const frame = document.getElementById('mainFrame');
+    // Corrected ID to match your HTML (rgbToggle instead of rgbToggleBtn)
+    const btn = document.getElementById('rgbToggle'); 
+    
+    const isActive = frame.classList.toggle('rgb-active');
+    
+    // Update the button text based on the active state
+    if (isActive) {
+        btn.innerText = "RGB FRAME: ON";
+        btn.classList.replace('bg-red-900/30', 'bg-green-900/30'); // Visual feedback
+        btn.classList.replace('text-red-400', 'text-green-400');
+    } else {
+        btn.innerText = "RGB FRAME: OFF";
+        btn.classList.replace('bg-green-900/30', 'bg-red-900/30'); // Red when OFF
+        btn.classList.replace('text-green-400', 'text-red-400');
+    }
+}
 
         function applyChanges() {
             const theme = document.getElementById('themeSelect').value;
@@ -283,11 +295,6 @@
         }, 4000); };
 
     </script>
-
-
-
-
-
 
 
 </body>
