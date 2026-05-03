@@ -3,6 +3,6 @@
   "target": {
     "namespace": "android_app",
     "package_name": "com.scrollzea.cardulator",
-    "sha256_cert_fingerprints": ["PASTE_NEW_SHA256_HERE"]
+    "sha256_cert_fingerprints": ["EB:39:3E:B1:FC:8E:53:E1:7C:55:52:81:D6:28:AB:EC:6E:24:00:BC:DF:0E:85:1F:3D:3F:E2:4A:D4:8C:63:16"]
   }
 }]
